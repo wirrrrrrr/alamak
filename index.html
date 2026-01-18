@@ -102,6 +102,107 @@
             margin-top: 2rem;
         }
 
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .service-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-card h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .service-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .features-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .features-list li {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+        }
+
+        .contact-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .contact-info p {
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-info a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            min-width: 150px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .json-display {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 2rem;
@@ -118,10 +219,8 @@
     <div class="container">
         <header>
             <h1>Welcome to My Website</h1>
-            <nav>
-                <a href="#home">Home</a>
-                <a href="#about">About</a>
-                <a href="#contact">Contact</a>
+            <nav id="nav-menu">
+                <!-- Navigation will be loaded from JSON -->
             </nav>
         </header>
 
@@ -134,18 +233,115 @@
 
             <section id="about">
                 <h2>About</h2>
-                <p>This is a simple HTML website template. Feel free to modify the content, colors, and styling to make it your own.</p>
+                <p id="about-description">Loading...</p>
+                <div id="stats-container"></div>
+            </section>
+
+            <section id="services">
+                <h2>Services</h2>
+                <div id="services-container" class="services-grid">
+                    <!-- Services will be loaded from JSON -->
+                </div>
             </section>
 
             <section id="contact">
                 <h2>Contact</h2>
-                <p>Get in touch with me through your preferred method of communication.</p>
+                <div id="contact-container" class="contact-info">
+                    <!-- Contact info will be loaded from JSON -->
+                </div>
+            </section>
+
+            <section id="features">
+                <h2>Features</h2>
+                <ul id="features-list" class="features-list">
+                    <!-- Features will be loaded from JSON -->
+                </ul>
+            </section>
+
+            <section id="json-data">
+                <h2>JSON Data</h2>
+                <p>Here's the JSON data being used on this page:</p>
+                <pre id="json-display" class="json-display">Loading JSON data...</pre>
             </section>
         </main>
 
         <footer>
-            <p>&copy; 2024 My Website. All rights reserved.</p>
+            <p>&copy; 2024 <span id="footer-title">My Website</span>. All rights reserved.</p>
         </footer>
     </div>
+
+    <script>
+        // Load and display JSON data
+        fetch('data.json')
+            .then(response => response.json())
+            .then(data => {
+                // Update navigation
+                const navMenu = document.getElementById('nav-menu');
+                navMenu.innerHTML = data.navigation.map(item => 
+                    `<a href="${item.href}">${item.label}</a>`
+                ).join('');
+
+                // Update about section
+                document.getElementById('about-description').textContent = data.siteInfo.description;
+                
+                // Display stats
+                const statsContainer = document.getElementById('stats-container');
+                statsContainer.innerHTML = `
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-number">${data.stats.projects}</div>
+                            <div>Projects</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${data.stats.clients}</div>
+                            <div>Clients</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${data.stats.experience}</div>
+                            <div>Experience</div>
+                        </div>
+                    </div>
+                `;
+
+                // Display services
+                const servicesContainer = document.getElementById('services-container');
+                servicesContainer.innerHTML = data.services.map(service => `
+                    <div class="service-card">
+                        <div class="service-icon">${service.icon}</div>
+                        <h3>${service.title}</h3>
+                        <p>${service.description}</p>
+                    </div>
+                `).join('');
+
+                // Display contact info
+                const contactContainer = document.getElementById('contact-container');
+                contactContainer.innerHTML = `
+                    <p><strong>Email:</strong> <a href="mailto:${data.contact.email}">${data.contact.email}</a></p>
+                    <p><strong>Phone:</strong> <a href="tel:${data.contact.phone}">${data.contact.phone}</a></p>
+                    <p><strong>Address:</strong> ${data.contact.address}</p>
+                    <p><strong>Social:</strong>
+                        <a href="${data.contact.social.twitter}" target="_blank">Twitter</a> |
+                        <a href="${data.contact.social.linkedin}" target="_blank">LinkedIn</a> |
+                        <a href="${data.contact.social.github}" target="_blank">GitHub</a>
+                    </p>
+                `;
+
+                // Display features
+                const featuresList = document.getElementById('features-list');
+                featuresList.innerHTML = data.features.map(feature => 
+                    `<li>${feature}</li>`
+                ).join('');
+
+                // Display JSON data
+                document.getElementById('json-display').textContent = JSON.stringify(data, null, 2);
+
+                // Update footer
+                document.getElementById('footer-title').textContent = data.siteInfo.title;
+            })
+            .catch(error => {
+                console.error('Error loading JSON data:', error);
+                document.getElementById('json-display').textContent = 'Error loading JSON data. Make sure data.json exists.';
+            });
+    </script>
 </body>
 </html>
